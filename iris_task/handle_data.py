@@ -1,7 +1,19 @@
 import os
 import numpy as np
 from typing import Tuple
+
 def load_dataset(relative_path: str = 'iris_data/iris_dataset.csv', verbose: bool = False) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Load the Iris dataset from a CSV file to RAM.
+
+    Parameters:
+    relative_path (str): The relative path to the CSV file. Default is 'iris_data/iris_dataset.csv'.
+    verbose (bool): If True, print additional information about the loaded dataset. Default is False.
+
+    Returns:
+    Tuple[np.ndarray, np.ndarray, np.ndarray]: A tuple containing three numpy arrays representing the setosa, versicolor, and virginica matrices respectively.
+    """
+
     # Get the directory path of the current Python script (such that it also works when using debugger)
     current_dir = os.path.dirname(os.path.abspath(__file__))
     path_to_data = os.path.join(current_dir, relative_path)
@@ -42,4 +54,22 @@ def load_dataset(relative_path: str = 'iris_data/iris_dataset.csv', verbose: boo
 
     return setosa_matrix, versicolor_matrix, virginica_matrix
 
-load_dataset()
+
+def split_dataset(iris_matrix: np.ndarray, split_index: int) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Splits the given iris_matrix into two parts based on the split_index.
+
+    Parameters:
+        iris_matrix (np.ndarray): The input iris matrix.
+        split_index (int): The index at which to split the iris matrix.
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: A tuple containing two parts of the iris matrix, 
+        where the first part contains the rows from 0 to split_index-1, and the second part 
+        contains the rows from split_index to the end.
+    """
+
+    if split_index >= len(iris_matrix):
+        raise ValueError("split_index must be smaller than the number of rows in iris_matrix")
+    return iris_matrix[:split_index], iris_matrix[split_index:]
+
