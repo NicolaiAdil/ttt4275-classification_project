@@ -1,15 +1,14 @@
 import matplotlib.pyplot as plt
+import sklearn.utils
 import numpy as np
 
 
-def plot_characteristics_separability(setosa_matrix: np.ndarray, versicolor_matrix: np.ndarray, virginica_matrix: np.ndarray) -> None:
+def plot_characteristics_separability(setosa_matrix: np.ndarray, versicolor_matrix: np.ndarray, virginica_matrix: np.ndarray, iris_feature_names: list) -> None:
     """
     Plots the characteristics of the iris dataset for each class.
 
     Parameters:
-        setosa_matrix (np.ndarray): The matrix containing the characteristics of the setosa class.
-        versicolor_matrix (np.ndarray): The matrix containing the characteristics of the versicolor class.
-        virginica_matrix (np.ndarray): The matrix containing the characteristics of the virginica class.
+        iris (sklearn.utils.Bunch): Object containing the iris dataset (data, labels, feature names, etc.).
     """
     fig, axs = plt.subplots(1, 2, figsize=(10, 8))
 
@@ -20,8 +19,8 @@ def plot_characteristics_separability(setosa_matrix: np.ndarray, versicolor_matr
     # Virginica
     axs[0].scatter(virginica_matrix[:, 0], virginica_matrix[:, 1], color='b', label='Virginica')
 
-    axs[0].set_xlabel('Sepal Length')
-    axs[0].set_ylabel('Sepal Width')
+    axs[0].set_xlabel(iris_feature_names[0])
+    axs[0].set_ylabel(iris_feature_names[1])
     axs[0].set_title('Sepal Characteristics of Iris Dataset')
     axs[0].legend()
 
@@ -33,8 +32,8 @@ def plot_characteristics_separability(setosa_matrix: np.ndarray, versicolor_matr
     # Virginica
     axs[1].scatter(virginica_matrix[:, 2], virginica_matrix[:, 3], color='b', label='Virginica')
 
-    axs[1].set_xlabel('Petal Length')
-    axs[1].set_ylabel('Petal Width')
+    axs[1].set_xlabel(iris_feature_names[2])
+    axs[1].set_ylabel(iris_feature_names[3])
     axs[1].set_title('Petal Characteristics of Iris Dataset')
     axs[1].legend()
 

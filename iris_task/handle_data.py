@@ -30,11 +30,12 @@ def load_dataset(relative_path: str = 'iris_data/iris_dataset.csv', verbose: boo
 
     # Populate matrices
     for i, entry in enumerate(data):
-        if entry[4] == 'Iris-setosa':
+        class_name = entry[4]
+        if class_name == 'Iris-setosa':
             setosa_matrix[i % 50] = (entry[0], entry[1], entry[2], entry[3])
-        elif entry[4] == 'Iris-versicolor':
+        elif class_name == 'Iris-versicolor':
             versicolor_matrix[i % 50] = (entry[0], entry[1], entry[2], entry[3])
-        elif entry[4] == 'Iris-virginica':
+        elif class_name == 'Iris-virginica':
             virginica_matrix[i % 50] = (entry[0], entry[1], entry[2], entry[3])
         else:
             print("Error: Unknown class")
