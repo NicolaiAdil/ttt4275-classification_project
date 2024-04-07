@@ -17,11 +17,13 @@ class LinearClassifier:
     def sigmoid(self, x):
         return 1 / (1 + np.exp(-x))
     
-    def get_gradient(predictions, ground_truth, data):
+    def get_gradient(self, predictions, ground_truth, data):
         grad_g_MSE = predictions - ground_truth
-        grad_z_g = predictions * (1 - predictions)
+        grad_z_g = np.multiply(predictions, (1 - predictions)).transpose()
         grad_W_z = data.transpose()
-        return np.sum(np.matmul(grad_g_MSE * grad_z_g, grad_W_z), axis=1)
+        print("Shapes:", grad_g_MSE.shape, grad_z_g.shape, grad_W_z.shape)
+        grad_W_MSE = np.sum(grad_g_MSE.dot(grad_z_g).dot(grad_W_z))
+        return grad_W_MSE
 
     def train(self, data: np.ndarray, ground_truth: np.ndarray, verbose: bool, num_classes: int = 3) -> list:
         """
@@ -46,8 +48,8 @@ class LinearClassifier:
         # Store the loss for each iteration
         loss_vector = [float('inf')]
 
-        encoder = OneHotEncoder(sparse=False)
-        ground_truth = encoder.fit_transform(ground_truth.reshape(-1, 1))
+        encoder = OneHotEncoder()
+        ground_truth = encoder.fit_transform(ground_truth.reshape(-1, 1)).toarray()
 
         for i in range(self.max_iter):
             prev_loss = loss_vector[i]
