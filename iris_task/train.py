@@ -2,30 +2,50 @@ import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 
 
-# Define the linear classifier (you can use any variant of gradient descent)
+def MSE(predictions, ground_truth):
+    error = predictions - ground_truth
+    return 1/2 * np.sum(np.matmul(error, error.transpose()))
+
+def sigmoid(x):
+        return 1 / (1 + np.exp(-x))
+
+def get_gradient_MSE(predictions, ground_truth, data):
+        grad_g_MSE = predictions - ground_truth
+        grad_z_g = np.multiply(predictions, (1 - predictions))
+        grad_W_z = data.transpose()
+
+        grad_W_MSE = np.multiply(grad_g_MSE, grad_z_g).transpose().dot(grad_W_z)
+        return grad_W_MSE
+
 class LinearClassifier:
-    def __init__(self, alpha=0.1, max_iter=1000, tol=1e-3):
+    def __init__(self, alpha=0.0025, max_iter=1000, tol=1e-3, num_classes=3):
         self.alpha = alpha  # Step factor
         self.max_iter = max_iter  # Maximum number of iterations
         self.tol = tol  # Tolerance for convergence
         self.weights = None  # Weights for linear classifier
+        self.num_classes = num_classes  # Number of classes
 
-    def softmax(self, x):
-        e_x = np.exp(x - np.max(x))
-        return e_x / e_x.sum(axis=0)
-    
-    def sigmoid(self, x):
-        return 1 / (1 + np.exp(-x))
-    
-    def get_gradient(self, predictions, ground_truth, data):
-        grad_g_MSE = predictions - ground_truth
-        grad_z_g = np.multiply(predictions, (1 - predictions)).transpose()
-        grad_W_z = data.transpose()
-        print("Shapes:", grad_g_MSE.shape, grad_z_g.shape, grad_W_z.shape)
-        grad_W_MSE = np.sum(grad_g_MSE.dot(grad_z_g).dot(grad_W_z))
-        return grad_W_MSE
+    def forward_pass(self, data):
+        """
+        Computes the forward pass of the model.
 
-    def train(self, data: np.ndarray, ground_truth: np.ndarray, verbose: bool, num_classes: int = 3) -> list:
+        Args:
+            data (numpy.ndarray): The input data of shape (num_features, num_samples).
+
+        Returns:
+            numpy.ndarray: The predictions of the model.
+        """
+        return sigmoid(np.matmul(self.weights, data)).transpose()
+    
+    def plot_confusion_matrix(self, data, ground_truth):
+        predictions = self.predict(data)
+        confusion_matrix = np.zeros([3, 3], dtype=int)
+        for i in range(len(predictions)):
+            confusion_matrix[np.argmax(predictions[i])][ground_truth[i]] += 1
+        return confusion_matrix
+
+    def train(self, data: np.ndarray, ground_truth: np.ndarray, test_data: np.ndarray,
+             test_ground_truth: np.ndarray, verbose: bool, num_classes: int = 3) -> list:
         """
         Trains the model using the given data and ground truth labels.
 
@@ -37,12 +57,14 @@ class LinearClassifier:
         Returns:
             list: A list containing the loss for each iteration.
         """
+        self.num_classes = num_classes
         num_samples, num_features = data.shape
-        self.weights = np.zeros([num_classes, num_features+1], dtype=int)  # Initialize weights
+        self.weights = np.zeros([num_classes, num_features+1], dtype=float)  # Initialize weights
         if verbose:
             print(f"Initial weights shape: {self.weights.shape}\n-----------------")
 
         data = np.concatenate((data, np.ones([data.shape[0], 1], dtype=int)), axis=1).transpose()  # Add bias term
+        test_data = np.concatenate((test_data, np.ones([test_data.shape[0], 1], dtype=int)), axis=1).transpose()  # Add bias term
         if verbose:
             print(f"Data shape: {data.shape}\n-----------------")
         # Store the loss for each iteration
@@ -50,30 +72,28 @@ class LinearClassifier:
 
         encoder = OneHotEncoder()
         ground_truth = encoder.fit_transform(ground_truth.reshape(-1, 1)).toarray()
+        test_ground_truth = encoder.fit_transform(test_ground_truth.reshape(-1, 1)).toarray()
 
         for i in range(self.max_iter):
             prev_loss = loss_vector[i]
 
-            # Compute loss and gradient
-            print(self.weights.shape, data.shape)
-            predictions = self.sigmoid(np.matmul(self.weights, data)).transpose()
-            
-            if verbose:
-                print(f"Predictions shape: {predictions.shape}\n-----------------")
-                print(predictions.transpose())
+            # Compute forward pass
+            predictions = self.forward_pass(data)  # Predictions
 
-            loss = 1/2 * np.sum( np.matmul((predictions - ground_truth), (predictions - ground_truth).transpose()) )
-            gradient = self.get_gradient(predictions, ground_truth, data)  # Derivative of loss function (MSE)
-
-            # Update weights
+            # Update weights based on gradient descent method
+            gradient = get_gradient_MSE(predictions, ground_truth, data)  # Derivative of loss function (MSE)
             self.weights -= self.alpha * gradient
 
+            # Test the current model on the test data
+            test_predictions = self.forward_pass(test_data)
+            test_loss = MSE(test_predictions, test_ground_truth)
+
             # Check for convergence
-            if abs(loss - prev_loss) < self.tol:
+            if abs(test_loss - prev_loss) < self.tol:
                 break
 
-            loss_vector.append(loss)
-            return loss_vector
+            loss_vector.append(test_loss)
+        return loss_vector
 
     def predict(self, data):
         return np.dot(data, self.weights)

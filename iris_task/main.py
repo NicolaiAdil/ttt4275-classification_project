@@ -35,16 +35,41 @@ def main(verbose=False):
     train_data = np.concatenate((train_setosa, train_versicolor, train_virginica))
     train_labels = np.concatenate((train_setosa_labels, train_versicolor_labels, train_virginica_labels))
 
+    test_data = np.concatenate((test_setosa, test_versicolor, test_virginica))
+    test_labels = np.concatenate((test_setosa_labels, test_versicolor_labels, test_virginica_labels))
+
     # --- Task 1b --- #
-    # Train the linear classifier
-    classifier = LinearClassifier()
-    loss_vector = classifier.train(train_data, train_labels, verbose)
-    plt.plot(loss_vector)
+    # Train the linear classifier for different step lengths
+    alphas = [0.0025, 0.005, 0.0075, 0.01]
+    for alpha in alphas:
+        classifier = LinearClassifier(alpha=alpha)
+        loss_vector = classifier.train(train_data, train_labels, test_data, test_labels, verbose)
+        plt.plot(loss_vector, label=f"Alpha: {alpha}")
+        print(f"Final MSE for alpha {alpha}:", loss_vector[-1])
+
+    plt.xlabel("Iteration")
+    plt.ylabel("MSE")
+    plt.title("MSE of the training data")
+    plt.legend()
+    plt.show()
+
+    # --- Task 1c --- #
+    # Finding the confussion matrix
+    classifier = LinearClassifier(alpha=0.0025)
+    classifier.train(train_data, train_labels, test_data, test_labels, verbose)
+    # confusion_matrix = classifier.plot_confusion_matrix(test_data, test_labels)
+    # print("Confusion matrix:", confusion_matrix)
+    
 
 
-
-
-
+    # classifier = LinearClassifier()
+    # weights, loss_vector = classifier.train(train_data, train_labels, test_data, test_labels, verbose)
+    # plt.plot(loss_vector)
+    # plt.xlabel("Iteration")
+    # plt.ylabel("Loss")
+    # plt.title("Loss vs Iteration")
+    # plt.show()
+    # print("Final loss:", loss_vector[-1])
 
 if __name__ == '__main__':
     verbose = False
