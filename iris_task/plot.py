@@ -40,3 +40,12 @@ def plot_characteristics_separability(setosa_matrix: np.ndarray, versicolor_matr
     plt.tight_layout()
 
     plt.show()
+
+def plot_error_rate(error_rate_vector, error_rate_test_vector, title):
+    plt.plot(error_rate_vector, label="Training data")
+    plt.plot(error_rate_test_vector, label="Test data")
+    plt.xlabel("Iteration")
+    plt.ylabel("Error rate")
+    plt.title(title)
+    plt.legend()
+    plt.show()

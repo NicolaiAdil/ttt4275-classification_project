@@ -18,12 +18,17 @@ def get_gradient_MSE(predictions, ground_truth, data):
         return grad_W_MSE
 
 class LinearClassifier:
-    def __init__(self, alpha=0.0025, max_iter=1000, tol=1e-3, num_classes=3):
+    def __init__(self, alpha=0.0025, max_iter=1000, tol=1e-3):
         self.alpha = alpha  # Step factor
         self.max_iter = max_iter  # Maximum number of iterations
         self.tol = tol  # Tolerance for convergence
         self.weights = None  # Weights for linear classifier
-        self.num_classes = num_classes  # Number of classes
+
+        self.data = None  # Input data
+        self.ground_truth = None  # Ground truth labels
+        self.test_data = None  # Test data
+        self.test_ground_truth = None  # Test ground truth labels
+
 
     def forward_pass(self, data):
         """
@@ -37,11 +42,38 @@ class LinearClassifier:
         """
         return sigmoid(np.matmul(self.weights, data)).transpose()
     
-    def plot_confusion_matrix(self, data, ground_truth):
-        predictions = self.predict(data)
+    def get_error_rate(self, predictions, ground_truth):
+        """
+        Computes the error rate of the model.
+
+        Args:
+            predictions (numpy.ndarray): The predictions of the model.
+            ground_truth (numpy.ndarray): The ground truth labels.
+
+        Returns:
+            float: The error rate of the model.
+        """
+        error_rate = 0
+        for i in range(len(predictions)):
+            if np.argmax(predictions[i]) != np.argmax(ground_truth[i]):
+                error_rate += 1
+        return error_rate / len(predictions)
+    
+    def get_confusion_matrix(self, train_or_test: str = "train"):
+
+        if train_or_test == "train":
+            data = self.data
+            ground_truth = self.ground_truth
+        elif train_or_test == "test":
+            data = self.test_data
+            ground_truth = self.test_ground_truth
+        else:
+            raise ValueError("train_or_test must be either 'train' or 'test'.")
+    
+        predictions = self.forward_pass(data)
         confusion_matrix = np.zeros([3, 3], dtype=int)
         for i in range(len(predictions)):
-            confusion_matrix[np.argmax(predictions[i])][ground_truth[i]] += 1
+            confusion_matrix[np.argmax(predictions[i])][np.argmax(ground_truth[i])] += 1
         return confusion_matrix
 
     def train(self, data: np.ndarray, ground_truth: np.ndarray, test_data: np.ndarray,
@@ -56,23 +88,34 @@ class LinearClassifier:
 
         Returns:
             list: A list containing the loss for each iteration.
+            list: A list containing the error rate for each iteration.
         """
-        self.num_classes = num_classes
         num_samples, num_features = data.shape
         self.weights = np.zeros([num_classes, num_features+1], dtype=float)  # Initialize weights
-        if verbose:
-            print(f"Initial weights shape: {self.weights.shape}\n-----------------")
+        
 
+        # Add bias term to the data (Bias trick), and update member variables
         data = np.concatenate((data, np.ones([data.shape[0], 1], dtype=int)), axis=1).transpose()  # Add bias term
+        self.data = data
+
         test_data = np.concatenate((test_data, np.ones([test_data.shape[0], 1], dtype=int)), axis=1).transpose()  # Add bias term
+        self.test_data = test_data
+
         if verbose:
             print(f"Data shape: {data.shape}\n-----------------")
-        # Store the loss for each iteration
-        loss_vector = [float('inf')]
 
+        # One-hot encode the ground truth labels
         encoder = OneHotEncoder()
         ground_truth = encoder.fit_transform(ground_truth.reshape(-1, 1)).toarray()
+        self.ground_truth = ground_truth
+
         test_ground_truth = encoder.fit_transform(test_ground_truth.reshape(-1, 1)).toarray()
+        self.test_ground_truth = test_ground_truth
+
+        # Store the loss and error rate for each iteration
+        loss_vector = [float('inf')]
+        error_rate_vector = [float('inf')]
+        error_rate_test_vector = [float('inf')]
 
         for i in range(self.max_iter):
             prev_loss = loss_vector[i]
@@ -84,7 +127,7 @@ class LinearClassifier:
             gradient = get_gradient_MSE(predictions, ground_truth, data)  # Derivative of loss function (MSE)
             self.weights -= self.alpha * gradient
 
-            # Test the current model on the test data
+            # Find loss of currents weights on test data
             test_predictions = self.forward_pass(test_data)
             test_loss = MSE(test_predictions, test_ground_truth)
 
@@ -93,7 +136,10 @@ class LinearClassifier:
                 break
 
             loss_vector.append(test_loss)
-        return loss_vector
+            error_rate_vector.append(self.get_error_rate(test_predictions, test_ground_truth))
+            error_rate_test_vector.append(self.get_error_rate(predictions, ground_truth))
+        
+        return loss_vector, error_rate_vector, error_rate_test_vector
 
     def predict(self, data):
         return np.dot(data, self.weights)
