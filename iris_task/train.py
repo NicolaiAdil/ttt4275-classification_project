@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
+import matplotlib.pyplot as plt
 
 
 def MSE(predictions, ground_truth):
@@ -16,6 +17,21 @@ def get_gradient_MSE(predictions, ground_truth, data):
 
         grad_W_MSE = np.multiply(grad_g_MSE, grad_z_g).transpose().dot(grad_W_z)
         return grad_W_MSE
+
+def train_and_plot_MSE(train_data, train_labels, test_data, test_labels, alphas, verbose):
+    alphas = [0.0025, 0.005, 0.0075, 0.01]
+    for alpha in alphas:
+        classifier = LinearClassifier(alpha=alpha)
+        loss_vector, _, _ = classifier.train(
+            train_data, train_labels, test_data, test_labels, verbose
+        )
+        plt.plot(loss_vector, label=f"Alpha: {alpha}")
+    # Plot the MSE for each step length
+    plt.xlabel("Iteration")
+    plt.ylabel("MSE")
+    # plt.title("MSE of the training data")
+    plt.legend()
+    plt.show()
 
 class LinearClassifier:
     def __init__(self, alpha=0.0025, max_iter=1000, tol=1e-3):

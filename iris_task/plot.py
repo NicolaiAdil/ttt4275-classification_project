@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import sklearn.utils
 import numpy as np
+import seaborn as sns
 
 
 def plot_characteristics_separability(setosa_matrix: np.ndarray, versicolor_matrix: np.ndarray, virginica_matrix: np.ndarray, iris_feature_names: list) -> None:
@@ -48,4 +49,23 @@ def plot_error_rate(error_rate_vector, error_rate_test_vector, title):
     plt.ylabel("Error rate")
     plt.title(title)
     plt.legend()
+    plt.show()
+
+def plot_confusion_matrix(classifier, iris, train_or_test):
+    confusion_matrix = classifier.get_confusion_matrix(
+        train_or_test=train_or_test
+    )
+    # Plot the confusion matrix
+    plt.figure(figsize=(10, 7))
+    sns.heatmap(
+        confusion_matrix,
+        annot=True,
+        fmt="d",
+        cmap="Blues",
+        xticklabels=iris.target_names,
+        yticklabels=iris.target_names,
+    )
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
+    plt.title(f"Confusion Matrix for {train_or_test} data")
     plt.show()
