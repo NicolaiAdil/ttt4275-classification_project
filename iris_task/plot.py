@@ -51,7 +51,7 @@ def plot_error_rate(error_rate_vector, error_rate_test_vector, title):
     plt.legend()
     plt.show()
 
-def plot_confusion_matrix(classifier, iris, train_or_test):
+def plot_confusion_matrix(classifier, class_names, train_or_test):
     confusion_matrix = classifier.get_confusion_matrix(
         train_or_test=train_or_test
     )
@@ -62,8 +62,8 @@ def plot_confusion_matrix(classifier, iris, train_or_test):
         annot=True,
         fmt="d",
         cmap="Blues",
-        xticklabels=iris.target_names,
-        yticklabels=iris.target_names,
+        xticklabels=class_names,
+        yticklabels=class_names,
     )
     plt.xlabel("Predicted")
     plt.ylabel("Actual")
