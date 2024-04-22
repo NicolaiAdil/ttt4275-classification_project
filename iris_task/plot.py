@@ -47,11 +47,11 @@ def plot_error_rate(error_rate_vector, error_rate_test_vector, title):
     plt.plot(error_rate_test_vector, label="Test data")
     plt.xlabel("Iteration")
     plt.ylabel("Error rate")
-    plt.title(title)
+    plt.title(f"Error rate of the training and test data: {title}")
     plt.legend()
     plt.show()
 
-def plot_confusion_matrix(classifier, iris, train_or_test):
+def plot_confusion_matrix(classifier, iris, train_or_test, title):
     confusion_matrix = classifier.get_confusion_matrix(
         train_or_test=train_or_test
     )
@@ -67,5 +67,5 @@ def plot_confusion_matrix(classifier, iris, train_or_test):
     )
     plt.xlabel("Predicted")
     plt.ylabel("Actual")
-    plt.title(f"Confusion Matrix for {train_or_test} data")
+    plt.title(f"Confusion Matrix for {train_or_test} data: {title}")
     plt.show()

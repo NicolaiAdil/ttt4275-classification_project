@@ -18,7 +18,7 @@ def get_gradient_MSE(predictions, ground_truth, data):
         grad_W_MSE = np.multiply(grad_g_MSE, grad_z_g).transpose().dot(grad_W_z)
         return grad_W_MSE
 
-def train_and_plot_MSE(train_data, train_labels, test_data, test_labels, alphas, verbose):
+def train_and_plot_MSE(train_data, train_labels, test_data, test_labels, alphas, title, verbose):
     alphas = [0.0025, 0.005, 0.0075, 0.01]
     for alpha in alphas:
         classifier = LinearClassifier(alpha=alpha)
@@ -27,6 +27,7 @@ def train_and_plot_MSE(train_data, train_labels, test_data, test_labels, alphas,
         )
         plt.plot(loss_vector, label=f"Alpha: {alpha}")
     # Plot the MSE for each step length
+    plt.title(f"MSE of the training data: {title}")
     plt.xlabel("Iteration")
     plt.ylabel("MSE")
     # plt.title("MSE of the training data")
