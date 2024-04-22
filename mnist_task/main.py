@@ -9,17 +9,30 @@ from train import Classifier
 
 def main():
     
-    classifier = Classifier()
-    classifier.load_data(mnist.load_data())
+    while True:
+        print("\nMenu:")
+        print("1: Nearest neighboor classifier using euclidean distance")
+        print("2: First 30 samples for training, last 20 samples for testing")
+        print("q: Quit")
 
-    # Prediction and evaluation
-    test_sample_size = 1000  # Test with smaller subset to save time
-    predictions = classifier.predict(classifier.test_data[:test_sample_size])
-    error_rate = classifier.get_error_rate(predictions, classifier.test_labels[:test_sample_size])
-    confusion_mtx = classifier.get_confusion_matrix(predictions, classifier.test_labels[:test_sample_size])
+        choice = input("Your choice: ")
 
-    print("Error Rate:", error_rate)
-    print("Confusion Matrix:\n", confusion_mtx)
+        if choice == "q":
+            break
+
+        if choice == "1":
+
+            mnist_classifier = Classifier()
+            mnist_classifier.load_data(mnist.load_data())
+
+            # Prediction and evaluation
+            test_sample_size = 1000  # Test with smaller subset to save time
+
+            predictions = mnist_classifier.predict(mnist_classifier.test_data[:test_sample_size])
+            error_rate = mnist_classifier.get_error_rate(predictions, mnist_classifier.test_labels[:test_sample_size])
+            mnist_classifier.get_confusion_matrix("test")  # Plot confusion matrix for test data
+
+            print("Error Rate:", error_rate)
 
 if __name__ == "__main__":
     main()
