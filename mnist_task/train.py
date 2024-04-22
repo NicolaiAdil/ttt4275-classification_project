@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import OneHotEncoder
-import seaborn as sns
 from scipy.spatial import distance  # For Euclidean distance calculation
 from tqdm import tqdm
 
@@ -11,11 +10,15 @@ class Classifier:
         self.train_labels = None
         self.test_data = None
         self.test_labels = None
+        self.num_classes = 10  # Number of classes in MNIST
 
-    def load_data(self, data):
+    def load_data(self, data, test_sample_size=100, train_sample_size=1000):
         (self.train_data, self.train_labels), (self.test_data, self.test_labels) = data
         self.train_data = self.train_data.reshape(-1, 28*28) / 255.0  # Flatten and normalize
         self.test_data = self.test_data.reshape(-1, 28*28) / 255.0  # Flatten and normalize
+        
+        self.test_labels , self.test_data  = self.test_labels[:test_sample_size]  , self.test_data[:test_sample_size]
+        self.train_labels, self.train_data = self.train_labels[:train_sample_size], self.train_data[:train_sample_size]
 
     def predict(self, data):
 
@@ -26,7 +29,7 @@ class Classifier:
             predictions[i] = self.train_labels[nearest_index]
         return predictions
 
-    def get_confusion_matrix(self, train_or_test="test"):
+    def get_confusion_matrix(self, predictions, train_or_test="test"):
         """
         Computes and plots the confusion matrix for specified data.
 
@@ -34,32 +37,18 @@ class Classifier:
             train_or_test (str): 'train' to use training data, 'test' to use testing data.
         """
         if train_or_test == "train":
-            data, labels = self.train_data, self.train_labels
+            labels = self.train_labels
         else:
-            data, labels = self.test_data, self.test_labels
+            labels = self.test_labels
 
-        predictions = self.predict(data)
-        num_classes = 10  # Number of classes in MNIST
-        confusion_matrix = np.zeros((num_classes, num_classes), dtype=int)
+        
+        confusion_matrix = np.zeros((self.num_classes, self.num_classes), dtype=int)
 
         for true, pred in zip(labels, predictions):
             confusion_matrix[true][pred] += 1
 
-        # Plot the confusion matrix
-        plt.figure(figsize=(10, 7))
-        sns.heatmap(
-            confusion_matrix,
-            annot=True,
-            fmt="d",
-            cmap="Blues",
-            xticklabels=[str(i) for i in range(num_classes)],
-            yticklabels=[str(i) for i in range(num_classes)]
-        )
-        plt.xlabel("Predicted")
-        plt.ylabel("Actual")
-        plt.title(f"Confusion Matrix for {train_or_test.capitalize()} Data")
-        plt.show()
+        return confusion_matrix
 
     def get_error_rate(self, predictions, ground_truth):
-        return np.mean(predictions != ground_truth)
+        return np.mean(predictions != ground_truth) * 100
     
