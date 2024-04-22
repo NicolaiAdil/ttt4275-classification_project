@@ -45,14 +45,15 @@ def main(verbose=False):
             iris_data[50:100],
             iris_data[100:150],
         )
-
+        
+        # Plot the characteristics of the iris dataset for each class
         if choice == "1":
             # Plot the characteristics of the iris dataset for each class
             plot_characteristics_separability(
                 setosa_matrix, versicolor_matrix, virginica_matrix, iris.feature_names
             )
 
-        # --- Task 1a --- #
+        # Use first 30 samples for training and last 20 samples for testing
         if choice == "2":
 
             # Split the dataset by class
@@ -92,6 +93,7 @@ def main(verbose=False):
             plot_confusion_matrix(best_classifier, iris, "train", "First 30 samples for training, last 20 samples for testing")
             plot_confusion_matrix(best_classifier, iris, "test", "First 30 samples for training, last 20 samples for testing")
 
+        # Use first 20 samples for training and last 30 samples for testing
         if choice == "3":
             # --- Task 1d --- #
             test_data, test_labels, train_data, train_labels = create_train_and_test(
@@ -122,25 +124,23 @@ def main(verbose=False):
             plot_confusion_matrix(best_classifier, iris, "train", "First 20 samples for training, last 30 samples for testing")
             plot_confusion_matrix(best_classifier, iris, "test", "First 20 samples for training, last 30 samples for testing")
 
+        # Remove features
         if choice in ['4','5','6']:
-            # --- Task 2a --- #
-            # Plot histograms for each feature and class
-            fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(12, 10))
-            features = iris.feature_names
-            species_name = iris.target_names
 
-            for i, feature in enumerate(features):
-                ax = axes[i // 2, i % 2]
-                for j, species in enumerate(np.unique(iris_labels)):
-                    sns.histplot(iris_data[iris_labels == j, i], ax=ax, label=species_name[j])
-                ax.set_title(feature)
-                ax.legend(title="Species")
-            plt.tight_layout()
-            plt.show()
+            if choice == "4":
+                # --- Task 2a --- #
+                indices_to_remove = [1] 
+                removed_features = ["Sepal Width"]
+            elif choice == "5":
+                # --- Task 2b --- #
+                indices_to_remove = [0, 1] 
+                removed_features = ["Sepal Length", "Sepal Width"]
+            elif choice == "6":
+                # --- Task 2b --- #
+                indices_to_remove = [0, 1, 2]
+                removed_features = ["Sepal Length", "Sepal Width", "Petal Length"]
 
-            feature_index_to_remove = 1  # Sepal Width is the second feature (index 1)
-            reduced_data = np.delete(iris_data, feature_index_to_remove, axis=1)
-            print(f"iris_data: {iris_data.shape} \n Reduced data: {reduced_data.shape}")
+            reduced_data = np.delete(iris_data, indices_to_remove, axis=1)
             reduced_setosa = reduced_data[:50]
             reduced_versicolor = reduced_data[50:100]
             reduced_virginica = reduced_data[100:150]
@@ -157,14 +157,13 @@ def main(verbose=False):
             plot_error_rate(
                 error_rate_vector,
                 error_rate_test_vector,
-                "Training and testing after removing 'Sepal Width'"
+                f"Training and testing after removing features: {removed_features}"
             )
-            plot_confusion_matrix(best_classifier, iris, "train", "After removing 'Sepal Width'")
-            plot_confusion_matrix(best_classifier, iris, "test", "After removing 'Sepal Width'")
-        if choice == "5":
-            print("TODO")
-        if choice == "6":
-            print("TODO")
+
+            # --- Task 2c --- #
+            plot_confusion_matrix(best_classifier, iris, "train", f"After removing features: {removed_features}")
+            plot_confusion_matrix(best_classifier, iris, "test", f"After removing features: {removed_features}")
+    
 
 
 

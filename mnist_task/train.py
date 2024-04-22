@@ -1,44 +1,33 @@
-from sklearn.datasets import fetch_openml
-from sklearn.model_selection import train_test_split
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import confusion_matrix
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import OneHotEncoder
+from scipy.spatial import distance  # For Euclidean distance calculation
 
-# Load MNIST dataset
-print("Loading MNIST dataset...")
-X, y = fetch_openml('mnist_784', version=1, return_X_y=True)
-print("MNIST dataset loaded.")
+class Classifier:
+    def __init__(self):
+        self.train_data = None
+        self.train_labels = None
 
-# Normalize pixel values
-X = X / 255.0
+    def load_data(self, data):
+        (self.train_data, self.train_labels), (self.test_data, self.test_labels) = data
+        self.train_data = self.train_data.reshape(-1, 28*28) / 255.0  # Flatten and normalize
+        self.test_data = self.test_data.reshape(-1, 28*28) / 255.0  # Flatten and normalize
 
-# Split dataset into chunks
-print("Splitting dataset into chunks...")
-chunk_size = 1000
-X_chunks = [X[i:i + chunk_size] for i in range(0, len(X), chunk_size)]
-y_chunks = [y[i:i + chunk_size] for i in range(0, len(y), chunk_size)]
-print("Dataset split into chunks.")
+    def predict(self, test_data, num_neighbors=1):
+        # Find Euclidean distances from test data to all training data
+        distances = distance.cdist(test_data, self.train_data, 'euclidean')
+        # Get the indices of the smallest distances
+        nearest_indices = np.argmin(distances, axis=1)
+        # Return the most common class among the nearest
+        return self.train_labels[nearest_indices]
 
-# Split data into training and test sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=1/7.0, random_state=0)
+    def get_confusion_matrix(self, predictions, ground_truth, num_classes=10):
+        confusion_matrix = np.zeros((num_classes, num_classes), dtype=int)
+        for true_class, predicted_class in zip(ground_truth, predictions):
+            confusion_matrix[true_class][predicted_class] += 1
+        return confusion_matrix
 
-# Create a k-NN classifier
-knn = KNeighborsClassifier(n_neighbors=1)
-
-# Train the classifier
-print("Training the classifier...")
-for i in range(len(X_chunks)):
-    knn.fit(X_chunks[i], y_chunks[i])
-print("Classifier trained.")
-
-# Predict the labels for the test data
-print("Predicting the labels for the test data...")
-y_pred = knn.predict(X_test)
-print("Labels predicted.")
-
-# Compute the confusion matrix and error rate
-cm = confusion_matrix(y_test, y_pred)
-error_rate = (y_test != y_pred).mean()
-
-print("Confusion Matrix:")
-print(cm)
-print("Error Rate:", error_rate)
+    def get_error_rate(self, predictions, ground_truth):
+        return np.mean(predictions != ground_truth)
+    
+    
