@@ -157,6 +157,3 @@ class LinearClassifier:
             error_rate_test_vector.append(self.get_error_rate(predictions, ground_truth))
         
         return loss_vector, error_rate_vector, error_rate_test_vector
-
-    def predict(self, data):
-        return np.dot(data, self.weights)

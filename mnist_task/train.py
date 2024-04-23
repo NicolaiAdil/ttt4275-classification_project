@@ -13,10 +13,17 @@ class Classifier:
         self.num_classes = 10  # Number of classes in MNIST
 
     def load_data(self, data, test_sample_size=100, train_sample_size=1000):
-        (self.train_data, self.train_labels), (self.test_data, self.test_labels) = data
-        self.train_data = self.train_data.reshape(-1, 28*28) / 255.0  # Flatten and normalize
-        self.test_data = self.test_data.reshape(-1, 28*28) / 255.0  # Flatten and normalize
+        self.train_data, self.train_labels, self.test_data, self.test_labels = data['trainv'], data['trainlab'], data['testv'], data['testlab']
         
+        # The handout data was strangely structured, hack to fix.
+        self.train_labels = np.array([label[0] for label in data['trainlab']])
+        self.test_labels = np.array([label[0] for label in data['testlab']])
+
+        # Flatten and normalize        
+        self.train_data = self.train_data.reshape(-1, 28*28) / 255.0
+        self.test_data = self.test_data.reshape(-1, 28*28) / 255.0 
+
+        # Slice the data to reduce computation time
         self.test_labels , self.test_data  = self.test_labels[:test_sample_size]  , self.test_data[:test_sample_size]
         self.train_labels, self.train_data = self.train_labels[:train_sample_size], self.train_data[:train_sample_size]
 

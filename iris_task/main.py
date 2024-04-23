@@ -30,11 +30,12 @@ def main(verbose=False):
         print("4: First 30 samples for training, remove sepal width")
         print("5: First 30 samples for training, remove setal width and sepal length")
         print("6: First 30 samples for training, remove sepal width, setal length and petal length")
+        print("7: Plot histograms for each feature and class")
         print("q: Quit")
 
         choice = input("Your choice: ")
 
-        if choice == "q":
+        if choice.lower() == "q":
             break
 
         # Load the Iris dataset
@@ -163,7 +164,36 @@ def main(verbose=False):
             # --- Task 2c --- #
             plot_confusion_matrix(best_classifier, iris, "train", f"After removing features: {removed_features}")
             plot_confusion_matrix(best_classifier, iris, "test", f"After removing features: {removed_features}")
-    
+
+        if choice == '7':
+            # Creating histograms for each feature with all classes in the same plot
+            features = iris.feature_names
+            class_names = iris.target_names
+            data = iris_data
+            labels = iris.target
+            
+            # Setting up the figure for plotting
+            fig, axes = plt.subplots(nrows=4, ncols=1, figsize=(6, 20))
+            colors = ['blue', 'orange', 'green']
+            
+            # Plotting histograms
+            for i, feature in enumerate(features):
+                ax = axes[i]
+                for j, class_name in enumerate(class_names):
+                    class_mask = labels == j
+                    ax.hist(data[class_mask, i], bins=10, color=colors[j], alpha=0.7, label=f"{class_name} ({feature})")
+                
+                ax.set_title(f"Histogram of {feature}")
+                ax.set_xlabel('Measurement')
+                ax.set_ylabel('Frequency')
+                ax.legend()
+            
+            # Adjust layout to prevent overlap
+            fig.tight_layout()
+            plt.subplots_adjust(hspace=0.5)  # Adjust the vertical space between plots
+            plt.show()
+
+
 
 
 
