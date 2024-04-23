@@ -1,14 +1,20 @@
 
 import os
-import numpy as np
 import scipy.io
 import matplotlib.pyplot as plt
+import time
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
 
 # Internal imports
 from train import Classifier
-from plotting import plot_confusion_matrix
+from plotting import (
+    plot_confusion_matrix,
+    plot_histogram,
+    display_classification,
+    plot_templates,
+)
+
 
 def get_data_from_mat(relative_path: str) -> dict:
     # Get the absolute path of the script (i.e., where the script is located)
@@ -19,64 +25,73 @@ def get_data_from_mat(relative_path: str) -> dict:
     
     return scipy.io.loadmat(mat_file_path)
 
-def plot_histogram(test_labels, train_labels, title="Histogram of class distribution"):
-    # Extract labels and their counts for the histograms
-    unique_test, counts_test = np.unique(test_labels, return_counts=True)
-    unique_train, counts_train = np.unique(train_labels, return_counts=True)
-    
-    # Creating a figure with two subplots
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))  # 1 row, 2 columns, figure size 12x6 inches
-    
-    # Plotting the test data histogram
-    ax1.bar(unique_test, counts_test, color='blue')
-    ax1.set_title('Test Data Class Distribution')
-    ax1.set_xlabel('Class')
-    ax1.set_ylabel('Frequency')
-    
-    # Plotting the training data histogram
-    ax2.bar(unique_train, counts_train, color='green')
-    ax2.set_title('Training Data Class Distribution')
-    ax2.set_xlabel('Class')
-    ax2.set_ylabel('Frequency')
-    
-    # Setting a main title for the figure
-    plt.suptitle(title)
-    
-    plt.show()
-
 
 def main():
     
     while True:
         print("\nMenu:")
-        print("1: Nearest neighboor classifier using euclidean distance")
-        print("2: K-Nearest neighboor classifier using euclidean distance")
+        print("1: Nearest neighboor classifier using euclidean distance (with batching)")
+        print("2: Nearest neighboor classifier: Compare time used with or without batching")
+        print("3: K-Nearest neighboor classifier using euclidean distance")
         print("q: Quit")
 
         choice = input("Your choice: ")
-
-        mnist_data = get_data_from_mat('mnist_data/data_all.mat')
+        print("\n")
 
         if choice == "q":
             break
 
-        if choice == "1":
-            TRAIN_SAMPLE_SIZE = len(mnist_data['trainlab'])  # Train with smaller subset to save time
-            TEST_SAMPLE_SIZE = 1000 #len(mnist_data['testlab'])  # Test with smaller subset to save time
+        mnist_data = get_data_from_mat('mnist_data/data_all.mat')
+        # Choose how large of a subset of the training and test data you want to train with
+        TRAIN_SAMPLE_SIZE = len(mnist_data['trainlab'])  
+        TEST_SAMPLE_SIZE = len(mnist_data['testlab']) // 20 # 5% of the test data, 500 samples
 
-            # Create the object and load data into the member variables
-            mnist_classifier = Classifier()
-            mnist_classifier.load_data(mnist_data, TEST_SAMPLE_SIZE, TRAIN_SAMPLE_SIZE)
+        # Create the object and load data into the member variables
+        mnist_classifier = Classifier()
+        mnist_classifier.load_data(mnist_data, TEST_SAMPLE_SIZE, TRAIN_SAMPLE_SIZE)
 
+        # Task 1
+        if choice in ['1', '2']:
+        
             plot_histogram(mnist_classifier.test_labels, mnist_classifier.train_labels, "Histogram of Class Distribution in Training Data")
             
-            # This is the same as solving K-means with K=1
-            predictions = mnist_classifier.k_means(mnist_classifier.test_data)
+            # Task 1a, 1b
+            if choice == '1':
 
-            error_rate = mnist_classifier.get_error_rate(predictions)
-            confusion_matrix = mnist_classifier.get_confusion_matrix(predictions, "test")
-            plot_confusion_matrix(confusion_matrix, mnist_classifier.num_classes, error_rate, "test")
+                # We look at just the nearest neighbor (k=1) to determine the class of the test data
+                predictions = mnist_classifier.process_in_batches(k=1, batch_size=1000)
 
+                error_rate = mnist_classifier.get_error_rate(predictions)
+                confusion_matrix = mnist_classifier.get_confusion_matrix(predictions, "test")
+                plot_confusion_matrix(confusion_matrix, mnist_classifier.num_classes, error_rate, "test")
+
+                # Display the classification results
+                images_reshaped = mnist_classifier.test_data.reshape(-1, 28, 28)  # Assuming test_data is flattened
+                display_classification(images_reshaped, mnist_classifier.test_labels, predictions, num_images=10)
+            
+            # Extra
+            if choice == '2':
+                # We look at just the nearest neighbor (k=1) to determine the class of the test data
+                start_time_batch = time.time()
+                predictions_batch = mnist_classifier.process_in_batches(k=1, batch_size=1000)
+                end_time_batch = time.time()
+                print(f"Time taken to process test data in batches: {end_time_batch - start_time_batch:.2f} seconds")
+
+                start_time = time.time()
+                predictions = mnist_classifier.predict(mnist_classifier.test_data, k=1)
+                end_time = time.time()
+                print(f"Time taken to predict test data: {end_time - start_time:.2f} seconds")
+
+            
+        if choice == '3':
+            # Perform clustering
+            templates = mnist_classifier.k_means_cluster_by_class(num_clusters=64)
+            
+            plot_templates(templates, nTemplates=6)
+
+        else:
+            print("Invalid choice. Please try again.")
+            continue
             
 
 if __name__ == "__main__":
