@@ -1,7 +1,7 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-def plot_confusion_matrix(confusion_matrix, num_classes, train_or_test="test"):
+def plot_confusion_matrix(confusion_matrix, num_classes, error_rate, train_or_test="test"):
     # Plot the confusion matrix
     plt.figure(figsize=(10, 7))
     sns.heatmap(
@@ -14,5 +14,5 @@ def plot_confusion_matrix(confusion_matrix, num_classes, train_or_test="test"):
     )
     plt.xlabel("Predicted")
     plt.ylabel("Actual")
-    plt.title(f"Confusion Matrix for {train_or_test.capitalize()} Data")
+    plt.title(f"Confusion Matrix for {train_or_test.capitalize()} Data \n Error rate : {error_rate:.2f}%")
     plt.show()

@@ -12,7 +12,7 @@ class Classifier:
         self.test_labels = None
         self.num_classes = 10  # Number of classes in MNIST
 
-    def load_data(self, data, test_sample_size=100, train_sample_size=1000):
+    def load_data(self, data, test_sample_size=1000, train_sample_size=10000):
         self.train_data, self.train_labels, self.test_data, self.test_labels = data['trainv'], data['trainlab'], data['testv'], data['testlab']
         
         # The handout data was strangely structured, hack to fix.
@@ -27,13 +27,13 @@ class Classifier:
         self.test_labels , self.test_data  = self.test_labels[:test_sample_size]  , self.test_data[:test_sample_size]
         self.train_labels, self.train_data = self.train_labels[:train_sample_size], self.train_data[:train_sample_size]
 
-    def predict(self, data):
-
+    def k_means(self, data, k=1):
         predictions = np.empty(data.shape[0], dtype=self.train_labels.dtype)
         for i in tqdm(range(data.shape[0]), desc="Predicting"):
             distances = distance.cdist([data[i]], self.train_data, 'euclidean')
-            nearest_index = np.argmin(distances)
-            predictions[i] = self.train_labels[nearest_index]
+            nearest_indices = np.argsort(distances[0])[:k]
+            nearest_labels = self.train_labels[nearest_indices]
+            predictions[i] = np.bincount(nearest_labels).argmax()
         return predictions
 
     def get_confusion_matrix(self, predictions, train_or_test="test"):
@@ -56,6 +56,6 @@ class Classifier:
 
         return confusion_matrix
 
-    def get_error_rate(self, predictions, ground_truth):
-        return np.mean(predictions != ground_truth) * 100
+    def get_error_rate(self, predictions):
+        return np.mean(predictions != self.test_labels) * 100
     

@@ -19,7 +19,6 @@ def get_gradient_MSE(predictions, ground_truth, data):
         return grad_W_MSE
 
 def train_and_plot_MSE(train_data, train_labels, test_data, test_labels, alphas, title, verbose):
-    alphas = [0.0025, 0.005, 0.0075, 0.01]
     for alpha in alphas:
         classifier = LinearClassifier(alpha=alpha)
         loss_vector, _, _ = classifier.train(

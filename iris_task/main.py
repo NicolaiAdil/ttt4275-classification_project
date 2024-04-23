@@ -46,6 +46,8 @@ def main(verbose=False):
             iris_data[50:100],
             iris_data[100:150],
         )
+
+        alphas = [0.0025, 0.005, 0.0075]
         
         # Plot the characteristics of the iris dataset for each class
         if choice == "1":
@@ -70,7 +72,7 @@ def main(verbose=False):
                 train_labels,
                 test_data,
                 test_labels,
-                [0.0025, 0.005, 0.0075, 0.01],
+                alphas,
                 "First 30 samples for training, last 20 samples for testing",
                 verbose,
             )
@@ -105,7 +107,7 @@ def main(verbose=False):
                 train_labels,
                 test_data,
                 test_labels,
-                [0.0025, 0.005, 0.0075, 0.01],
+                alphas,
                 "First 20 samples for training, last 30 samples for testing",
                 verbose,
             )
