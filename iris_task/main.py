@@ -80,7 +80,8 @@ def main(verbose=False):
             # --- Task 1c --- #
 
             # Train the linear classifier with the best step length found from previous attempt
-            best_classifier = LinearClassifier(alpha=0.005)
+            best_alpha = 0.005
+            best_classifier = LinearClassifier(alpha=best_alpha)
 
             _, error_rate_vector, error_rate_test_vector = best_classifier.train(
                 train_data, train_labels, test_data, test_labels, verbose
@@ -89,12 +90,12 @@ def main(verbose=False):
             plot_error_rate(
                 error_rate_vector,
                 error_rate_test_vector,
-                "First 30 samples for training, last 20 samples for testing",
+                f"First 30 samples for training, last 20 samples for testing\nα = {best_alpha}",
             )
 
             # Plot the confusion matrix for the training and test data
-            plot_confusion_matrix(best_classifier, iris, "train", "First 30 samples for training, last 20 samples for testing")
-            plot_confusion_matrix(best_classifier, iris, "test", "First 30 samples for training, last 20 samples for testing")
+            plot_confusion_matrix(best_classifier, iris, "train", f"First 30 samples for training, last 20 samples for testing\nα = {best_alpha}")
+            plot_confusion_matrix(best_classifier, iris, "test", f"First 30 samples for training, last 20 samples for testing\nα = {best_alpha}")
 
         # Use first 20 samples for training and last 30 samples for testing
         if choice == "3":
@@ -111,7 +112,8 @@ def main(verbose=False):
                 "First 20 samples for training, last 30 samples for testing",
                 verbose,
             )
-            best_classifier = LinearClassifier(alpha=0.005)
+            best_alpha = 0.005
+            best_classifier = LinearClassifier(alpha=best_alpha)
 
             _, error_rate_vector, error_rate_test_vector = best_classifier.train(
                 train_data, train_labels, test_data, test_labels, verbose
@@ -120,12 +122,12 @@ def main(verbose=False):
             plot_error_rate(
                 error_rate_vector,
                 error_rate_test_vector,
-                "First 20 samples for training, last 30 samples for testing",
+                f"First 20 samples for training, last 30 samples for testing\nα = {best_alpha}",
             )
 
             # Plot the confusion matrix for the training and test data
-            plot_confusion_matrix(best_classifier, iris, "train", "First 20 samples for training, last 30 samples for testing")
-            plot_confusion_matrix(best_classifier, iris, "test", "First 20 samples for training, last 30 samples for testing")
+            plot_confusion_matrix(best_classifier, iris, "train", f"First 20 samples for training, last 30 samples for testing\nα = {best_alpha}")
+            plot_confusion_matrix(best_classifier, iris, "test", f"First 20 samples for training, last 30 samples for testing\nα = {best_alpha}")
 
         # Remove features
         if choice in ['4','5','6']:
@@ -151,8 +153,8 @@ def main(verbose=False):
             train_data, train_labels, test_data, test_labels = create_train_and_test(
                 reduced_setosa, reduced_versicolor, reduced_virginica, 30
             )
-
-            best_classifier = LinearClassifier(alpha=0.005)
+            best_alpha = 0.005
+            best_classifier = LinearClassifier(alpha=best_alpha)
             _, error_rate_vector, error_rate_test_vector = best_classifier.train(
                 train_data, train_labels, test_data, test_labels, verbose
             )
@@ -160,12 +162,12 @@ def main(verbose=False):
             plot_error_rate(
                 error_rate_vector,
                 error_rate_test_vector,
-                f"Training and testing after removing features: {removed_features}"
+                f"Training and testing after removing features: {removed_features}\nα = {best_alpha}"
             )
 
             # --- Task 2c --- #
-            plot_confusion_matrix(best_classifier, iris, "train", f"After removing features: {removed_features}")
-            plot_confusion_matrix(best_classifier, iris, "test", f"After removing features: {removed_features}")
+            plot_confusion_matrix(best_classifier, iris, "train", f"After removing features: {removed_features}\nα = {best_alpha}")
+            plot_confusion_matrix(best_classifier, iris, "test", f"After removing features: {removed_features}\nα = {best_alpha}")
 
         if choice == '7':
             # Creating histograms for each feature with all classes in the same plot
