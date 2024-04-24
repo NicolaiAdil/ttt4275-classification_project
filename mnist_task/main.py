@@ -31,7 +31,7 @@ def main():
         print("\nMenu:")
         print("1: All data: K-Nearest neighboor classifier using euclidean distance k=1")
         print("2: All data: K-Nearest neighboor classifier using euclidean distance k=5")
-        print("3: All data: K-Nearest neighboor classifier: Compare time used with or without batching k=1 REMEMBER TO CHANGE TEST SAMPLE SIZE TO MAX TO SEE RESULTS!")
+        print("3: All data: K-Nearest neighboor classifier: Compare time used with or without batching k=1 REMEMBER TO CHANGE TEST SAMPLE SIZE!")
         print("4: Clustering: K-Nearest neighboor classifier using euclidean distance k=1")
         print("5: Clustering: K-Nearest neighboor classifier using euclidean distance k=7")
         print("q: Quit")
@@ -102,7 +102,9 @@ def main():
                     title=f"Classification Results\nK={k}",
                 )
 
-            # Extra
+            # Extra. 
+            # To see real results you should change the TEST_SAMPLE_SIZE to a larger number (e.g. 10,000)
+            # This is due to the fact that a computer has no problem with 1000 samples in memory, but struggles with for example 10,000 samples.
             elif choice == "3":
                 start_time_batch = time.time()
                 predictions_batch = mnist_classifier.process_in_batches(
