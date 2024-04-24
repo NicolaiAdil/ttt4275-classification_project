@@ -19,7 +19,7 @@ def plot_confusion_matrix(
     plt.xlabel("Predicted")
     plt.ylabel("Actual")
     plt.title(
-        f"Confusion Matrix for {train_or_test.capitalize()} Data.\nK = {k}\nError rate : {error_rate:.2f}%"
+        f"Confusion Matrix for {train_or_test.capitalize()} Data\nK = {k}\nError rate : {error_rate:.2f}%"
     )
     plt.show()
 

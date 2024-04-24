@@ -29,7 +29,6 @@ def train_and_plot_MSE(train_data, train_labels, test_data, test_labels, alphas,
     plt.title(f"MSE of the training data: {title}")
     plt.xlabel("Iteration")
     plt.ylabel("MSE")
-    # plt.title("MSE of the training data")
     plt.legend()
     plt.show()
 

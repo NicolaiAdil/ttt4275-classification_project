@@ -31,7 +31,7 @@ def main():
         print("\nMenu:")
         print("1: All data: K-Nearest neighboor classifier using euclidean distance k=1")
         print("2: All data: K-Nearest neighboor classifier using euclidean distance k=5")
-        print("3: All data: K-Nearest neighboor classifier: Compare time used with or without batching k=1")
+        print("3: All data: K-Nearest neighboor classifier: Compare time used with or without batching k=1 REMEMBER TO CHANGE TEST SAMPLE SIZE TO MAX TO SEE RESULTS!")
         print("4: Clustering: K-Nearest neighboor classifier using euclidean distance k=1")
         print("5: Clustering: K-Nearest neighboor classifier using euclidean distance k=7")
         print("q: Quit")
@@ -44,11 +44,18 @@ def main():
 
         mnist_data = get_data_from_mat("mnist_data/data_all.mat")
 
+        # Choose how large of a subset of the training and test data you want to train with
+        TRAIN_SAMPLE_SIZE = TRAIN_SAMPLE_SIZE = len(mnist_data["trainlab"])
+        TEST_SAMPLE_SIZE = (len(mnist_data["testlab"]) // 20)  # 5% of the test data, 500 samples #len(mnist_data["testlab"])
+
         # Task 1
         if choice in ["1", "2", "3"]:
-            # Choose how large of a subset of the training and test data you want to train with
-            TRAIN_SAMPLE_SIZE = len(mnist_data["trainlab"])
-            TEST_SAMPLE_SIZE = len(mnist_data["testlab"]) // 20  # 5% of the test data, 500 samples
+            # Task 1a
+            if choice in ["1", "3"]:
+                k = 1
+            # Extra
+            if choice == "2":
+                k = 5
 
             # Create the object and load data into the member variables
             mnist_classifier = Classifier()
@@ -62,13 +69,6 @@ def main():
 
             # Task 1
             if choice in ["1", "2"]:
-                # Task 1a
-                if choice == "1":
-                    k = 1
-                # Extra
-                if choice == "2":
-                    k = 5
-
                 # We look at just the nearest neighbor (k=1) to determine the class of the test data
                 predictions = mnist_classifier.process_in_batches(
                     mnist_classifier.test_data,
@@ -103,9 +103,7 @@ def main():
                 )
 
             # Extra
-            if choice == "3":
-                k = 1
-
+            elif choice == "3":
                 start_time_batch = time.time()
                 predictions_batch = mnist_classifier.process_in_batches(
                     mnist_classifier.test_data,
@@ -116,7 +114,7 @@ def main():
                 )
                 end_time_batch = time.time()
                 print(
-                    f"---\nTime taken to process test data in batches: {end_time_batch - start_time_batch:.2f} seconds\n k={k}\nTrain data samples = {TRAIN_SAMPLE_SIZE}\nTest data samples = {TEST_SAMPLE_SIZE}\n---"
+                    f"---\nTime taken to process test data in batches: {end_time_batch - start_time_batch:.2f} seconds\nk={k}\nTrain data samples = {TRAIN_SAMPLE_SIZE}\nTest data samples = {TEST_SAMPLE_SIZE}\n---"
                 )
 
                 start_time = time.time()
@@ -128,16 +126,11 @@ def main():
                 )
                 end_time = time.time()
                 print(
-                    f"---\nTime taken to predict test data: {end_time - start_time:.2f} seconds\n k={k}\nTrain data samples = {TRAIN_SAMPLE_SIZE}\nTest data samples = {TEST_SAMPLE_SIZE}\n---"
+                    f"---\nTime taken to predict test data without batching: {end_time - start_time:.2f} seconds\nk={k}\nTrain data samples = {TRAIN_SAMPLE_SIZE}\nTest data samples = {TEST_SAMPLE_SIZE}\n---"
                 )
 
         # Task 2
-        if choice in ["4", "5"]:
-            # Choose how large of a subset of the training and test data you want to train with
-            TRAIN_SAMPLE_SIZE = 6000
-            TEST_SAMPLE_SIZE = (
-                len(mnist_data["testlab"]) // 20
-            )  # 5% of the test data, 500 samples
+        elif choice in ["4", "5"]:
             if choice == "4":
                 k = 1
             # Task 2c
