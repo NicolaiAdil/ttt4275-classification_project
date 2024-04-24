@@ -104,10 +104,10 @@ def display_classification(
     plt.show()
 
 
-def plot_templates(templates, labels, nTemplates=6, nClasses=10):
+def plot_templates(templates, labels, nClusters, nTemplates=6, nClasses=10):
     fig, axes = plt.subplots(
         nClasses, nTemplates, figsize=(12, 20)
-    )  # 10 rows for 10 classes
+    )
 
     # Iterate over each class
     for i in range(nClasses):
@@ -126,7 +126,7 @@ def plot_templates(templates, labels, nTemplates=6, nClasses=10):
 
     # Set a common title for all subplots
     fig.suptitle(
-        f"The first {nTemplates} K-Means Cluster Centers for Each Class",
+        f"The first {nTemplates} of {nClusters} Cluster Centers for Each Class",
         fontsize=16,
         y=0.95,
     )

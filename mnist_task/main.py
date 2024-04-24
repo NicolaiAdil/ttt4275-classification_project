@@ -60,7 +60,7 @@ def main():
                 "Histogram of Class Distribution in Test and Train Data",
             )
 
-            # Task 1a, 1b
+            # Task 1
             if choice in ["1", "2"]:
                 # Task 1a
                 if choice == "1":
@@ -131,6 +131,7 @@ def main():
                     f"Time taken to predict test data: {end_time - start_time:.2f} seconds\n k={k}\nTrain data samples = {TRAIN_SAMPLE_SIZE}\nTest data samples = {TEST_SAMPLE_SIZE}"
                 )
 
+        # Task 2
         if choice in ["4", "5"]:
             # Choose how large of a subset of the training and test data you want to train with
             TRAIN_SAMPLE_SIZE = 6000
@@ -143,21 +144,19 @@ def main():
             if choice == "5":
                 k = 7
 
+            # Create the object and load data into the member variables
+            mnist_classifier = Classifier()
+            mnist_classifier.load_data(mnist_data, TEST_SAMPLE_SIZE, TRAIN_SAMPLE_SIZE)
+
             plot_histogram(
                 mnist_classifier.test_labels,
                 mnist_classifier.train_labels,
                 "Histogram of Class Distribution in Test and Train Data",
             )
 
-            # Create the object and load data into the member variables
-            mnist_classifier = Classifier()
-            mnist_classifier.load_data(mnist_data, TEST_SAMPLE_SIZE, TRAIN_SAMPLE_SIZE)
-
             # Task 2a
-            templates_data, template_labels = mnist_classifier.cluster_by_class(
-                num_clusters=64
-            )
-            plot_templates(templates_data, template_labels, nTemplates=6)
+            templates_data, template_labels = mnist_classifier.cluster_by_class(num_clusters=64)
+            plot_templates(templates_data, template_labels, 64, nTemplates=6)
 
             # Perform classification
             start_time = time.time()
