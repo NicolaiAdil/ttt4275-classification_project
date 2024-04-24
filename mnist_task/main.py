@@ -116,7 +116,7 @@ def main():
                 )
                 end_time_batch = time.time()
                 print(
-                    f"Time taken to process test data in batches: {end_time_batch - start_time_batch:.2f} seconds\n k={k}\nTrain data samples = {TRAIN_SAMPLE_SIZE}\nTest data samples = {TEST_SAMPLE_SIZE}"
+                    f"---\nTime taken to process test data in batches: {end_time_batch - start_time_batch:.2f} seconds\n k={k}\nTrain data samples = {TRAIN_SAMPLE_SIZE}\nTest data samples = {TEST_SAMPLE_SIZE}\n---"
                 )
 
                 start_time = time.time()
@@ -128,7 +128,7 @@ def main():
                 )
                 end_time = time.time()
                 print(
-                    f"Time taken to predict test data: {end_time - start_time:.2f} seconds\n k={k}\nTrain data samples = {TRAIN_SAMPLE_SIZE}\nTest data samples = {TEST_SAMPLE_SIZE}"
+                    f"---\nTime taken to predict test data: {end_time - start_time:.2f} seconds\n k={k}\nTrain data samples = {TRAIN_SAMPLE_SIZE}\nTest data samples = {TEST_SAMPLE_SIZE}\n---"
                 )
 
         # Task 2
@@ -155,7 +155,12 @@ def main():
             )
 
             # Task 2a
+            start_time = time.time()
             templates_data, template_labels = mnist_classifier.cluster_by_class(num_clusters=64)
+            end_time = time.time()
+            print(
+                f"---\nTime taken to cluster training data: {end_time - start_time:.2f} seconds\nTrain data samples = {TRAIN_SAMPLE_SIZE}\nTest data samples = {TEST_SAMPLE_SIZE}\n---"
+            )
             plot_templates(templates_data, template_labels, 64, nTemplates=6)
 
             # Perform classification
@@ -167,7 +172,7 @@ def main():
 
             # Task 2b
             print(
-                f"Time taken to predict test data: {end_time - start_time:.2f} seconds\nk={k}\nTrain data samples = {TRAIN_SAMPLE_SIZE}\nTest data samples = {TEST_SAMPLE_SIZE}"
+                f"---\nTime taken to predict test data: {end_time - start_time:.2f} seconds\nk={k}\nTrain data samples = {TRAIN_SAMPLE_SIZE}\nTest data samples = {TEST_SAMPLE_SIZE}\n---"
             )
             error_rate = mnist_classifier.get_error_rate(predictions)
             confusion_matrix = mnist_classifier.get_confusion_matrix(
@@ -176,17 +181,6 @@ def main():
             plot_confusion_matrix(
                 confusion_matrix, mnist_classifier.num_classes, error_rate, k, "test"
             )
-
-            # # Display the classification results
-            # images_reshaped = mnist_classifier.test_data.reshape(
-            #     -1, 28, 28
-            # )  # Assuming test_data is flattened
-            # display_classification(
-            #     images_reshaped,
-            #     mnist_classifier.test_labels,
-            #     predictions,
-            #     num_images=10,
-            # )
 
         else:
             print("Invalid choice. Please try again.")
