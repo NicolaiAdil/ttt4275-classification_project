@@ -29,24 +29,38 @@ def main():
 
     while True:
         print("\nMenu:")
-        print("1: All data: K-Nearest neighboor classifier using euclidean distance k=1")
-        print("2: All data: K-Nearest neighboor classifier using euclidean distance k=5")
-        print("3: All data: K-Nearest neighboor classifier: Compare time used with or without batching k=1 REMEMBER TO CHANGE TEST SAMPLE SIZE!")
-        print("4: Clustering: K-Nearest neighboor classifier using euclidean distance k=1")
-        print("5: Clustering: K-Nearest neighboor classifier using euclidean distance k=7")
+        print(
+            "1: All data: K-Nearest neighboor classifier using euclidean distance k=1"
+        )
+        print(
+            "2: All data: K-Nearest neighboor classifier using euclidean distance k=5"
+        )
+        print(
+            "3: All data: K-Nearest neighboor classifier: Compare time used with or without batching k=1 REMEMBER TO CHANGE TEST SAMPLE SIZE!"
+        )
+        print(
+            "4: Clustering: K-Nearest neighboor classifier using euclidean distance k=1"
+        )
+        print(
+            "5: Clustering: K-Nearest neighboor classifier using euclidean distance k=7"
+        )
         print("q: Quit")
 
         choice = input("Your choice: ")
         print("\n")
 
-        if choice == "q":
+        if choice.lower() == "q":
             break
 
         mnist_data = get_data_from_mat("mnist_data/data_all.mat")
 
         # Choose how large of a subset of the training and test data you want to train with
-        TRAIN_SAMPLE_SIZE = TRAIN_SAMPLE_SIZE = len(mnist_data["trainlab"])
-        TEST_SAMPLE_SIZE = (len(mnist_data["testlab"]) // 20)  # 5% of the test data, 500 samples #len(mnist_data["testlab"])
+        TRAIN_SAMPLE_SIZE = TRAIN_SAMPLE_SIZE = len(
+            mnist_data["trainlab"]
+        )  # 100% of the training data, 60,000 samples
+        TEST_SAMPLE_SIZE = (
+            len(mnist_data["testlab"]) // 20
+        )  # 5% of the test data, 500 samples
 
         # Task 1
         if choice in ["1", "2", "3"]:
@@ -85,8 +99,7 @@ def main():
                 plot_confusion_matrix(
                     confusion_matrix,
                     mnist_classifier.num_classes,
-                    error_rate,
-                    k,
+                    f"\nK = {k}\nTrain Size: {TRAIN_SAMPLE_SIZE}, Test Size: {TEST_SAMPLE_SIZE}\nError rate : {error_rate:.2f}%",
                     "test",
                 )
 
@@ -99,10 +112,10 @@ def main():
                     mnist_classifier.test_labels,
                     predictions,
                     num_images=10,
-                    title=f"Classification Results\nK={k}",
+                    title=f"Classification Results\nK={k}\nTrain Size: {TRAIN_SAMPLE_SIZE}, Test Size: {TEST_SAMPLE_SIZE}\nError rate : {error_rate:.2f}%",
                 )
 
-            # Extra. 
+            # Extra.
             # To see real results you should change the TEST_SAMPLE_SIZE to a larger number (e.g. 10,000)
             # This is due to the fact that a computer has no problem with 1000 samples in memory, but struggles with for example 10,000 samples.
             elif choice == "3":
@@ -151,7 +164,9 @@ def main():
 
             # Task 2a
             start_time = time.time()
-            templates_data, template_labels = mnist_classifier.cluster_by_class(num_clusters=64)
+            templates_data, template_labels = mnist_classifier.cluster_by_class(
+                num_clusters=64
+            )
             end_time = time.time()
             print(
                 f"---\nTime taken to cluster training data: {end_time - start_time:.2f} seconds\nTrain data samples = {TRAIN_SAMPLE_SIZE}\nTest data samples = {TEST_SAMPLE_SIZE}\n---"
@@ -174,7 +189,10 @@ def main():
                 predictions, "test"
             )
             plot_confusion_matrix(
-                confusion_matrix, mnist_classifier.num_classes, error_rate, k, "test"
+                confusion_matrix,
+                mnist_classifier.num_classes,
+                f"\nK = {k}\nTrain Size: {TRAIN_SAMPLE_SIZE}, Test Size: {TEST_SAMPLE_SIZE}\nError rate : {error_rate:.2f}%",
+                "test",
             )
 
         else:

@@ -6,8 +6,8 @@ import seaborn as sns
 
 # Internal imports
 from handle_data import (
-    load_dataset, 
-    split_dataset, 
+    load_dataset,
+    split_dataset,
     create_train_and_test,
 )
 from plot import (
@@ -16,9 +16,10 @@ from plot import (
     plot_confusion_matrix,
 )
 from train import (
-    LinearClassifier, 
+    LinearClassifier,
     train_and_plot_MSE,
 )
+
 
 def main(verbose=False):
 
@@ -29,7 +30,9 @@ def main(verbose=False):
         print("3: First 20 samples for training, last 30 samples for testing")
         print("4: First 30 samples for training, remove sepal width")
         print("5: First 30 samples for training, remove setal width and sepal length")
-        print("6: First 30 samples for training, remove sepal width, setal length and petal length")
+        print(
+            "6: First 30 samples for training, remove sepal width, setal length and petal length"
+        )
         print("7: Plot histograms for each feature and class")
         print("q: Quit")
 
@@ -48,7 +51,7 @@ def main(verbose=False):
         )
 
         alphas = [0.0025, 0.005, 0.0075]
-        
+
         # Plot the characteristics of the iris dataset for each class
         if choice == "1":
             # Plot the characteristics of the iris dataset for each class
@@ -94,8 +97,18 @@ def main(verbose=False):
             )
 
             # Plot the confusion matrix for the training and test data
-            plot_confusion_matrix(best_classifier, iris, "train", f"First 30 samples for training, last 20 samples for testing\nα = {best_alpha}")
-            plot_confusion_matrix(best_classifier, iris, "test", f"First 30 samples for training, last 20 samples for testing\nα = {best_alpha}")
+            plot_confusion_matrix(
+                best_classifier,
+                iris,
+                "train",
+                f"First 30 samples for training, last 20 samples for testing\nα = {best_alpha}",
+            )
+            plot_confusion_matrix(
+                best_classifier,
+                iris,
+                "test",
+                f"First 30 samples for training, last 20 samples for testing\nα = {best_alpha}",
+            )
 
         # Use first 20 samples for training and last 30 samples for testing
         if choice == "3":
@@ -126,19 +139,29 @@ def main(verbose=False):
             )
 
             # Plot the confusion matrix for the training and test data
-            plot_confusion_matrix(best_classifier, iris, "train", f"First 20 samples for training, last 30 samples for testing\nα = {best_alpha}")
-            plot_confusion_matrix(best_classifier, iris, "test", f"First 20 samples for training, last 30 samples for testing\nα = {best_alpha}")
+            plot_confusion_matrix(
+                best_classifier,
+                iris,
+                "train",
+                f"First 20 samples for training, last 30 samples for testing\nα = {best_alpha}",
+            )
+            plot_confusion_matrix(
+                best_classifier,
+                iris,
+                "test",
+                f"First 20 samples for training, last 30 samples for testing\nα = {best_alpha}",
+            )
 
         # Remove features
-        if choice in ['4','5','6']:
+        if choice in ["4", "5", "6"]:
 
             if choice == "4":
                 # --- Task 2a --- #
-                indices_to_remove = [1] 
+                indices_to_remove = [1]
                 removed_features = ["Sepal Width"]
             elif choice == "5":
                 # --- Task 2b --- #
-                indices_to_remove = [0, 1] 
+                indices_to_remove = [0, 1]
                 removed_features = ["Sepal Length", "Sepal Width"]
             elif choice == "6":
                 # --- Task 2b --- #
@@ -162,43 +185,56 @@ def main(verbose=False):
             plot_error_rate(
                 error_rate_vector,
                 error_rate_test_vector,
-                f"Training and testing after removing features: {removed_features}\nα = {best_alpha}"
+                f"Training and testing after removing features: {removed_features}\nα = {best_alpha}",
             )
 
             # --- Task 2c --- #
-            plot_confusion_matrix(best_classifier, iris, "train", f"After removing features: {removed_features}\nα = {best_alpha}")
-            plot_confusion_matrix(best_classifier, iris, "test", f"After removing features: {removed_features}\nα = {best_alpha}")
+            plot_confusion_matrix(
+                best_classifier,
+                iris,
+                "train",
+                f"After removing features: {removed_features}\nα = {best_alpha}",
+            )
+            plot_confusion_matrix(
+                best_classifier,
+                iris,
+                "test",
+                f"After removing features: {removed_features}\nα = {best_alpha}",
+            )
 
-        if choice == '7':
+        if choice == "7":
             # Creating histograms for each feature with all classes in the same plot
             features = iris.feature_names
             class_names = iris.target_names
             data = iris_data
             labels = iris.target
-            
+
             # Setting up the figure for plotting
             fig, axes = plt.subplots(nrows=4, ncols=1, figsize=(6, 20))
-            colors = ['blue', 'orange', 'green']
-            
+            colors = ["blue", "orange", "green"]
+
             # Plotting histograms
             for i, feature in enumerate(features):
                 ax = axes[i]
                 for j, class_name in enumerate(class_names):
                     class_mask = labels == j
-                    ax.hist(data[class_mask, i], bins=10, color=colors[j], alpha=0.7, label=f"{class_name} ({feature})")
-                
+                    ax.hist(
+                        data[class_mask, i],
+                        bins=10,
+                        color=colors[j],
+                        alpha=0.7,
+                        label=f"{class_name} ({feature})",
+                    )
+
                 ax.set_title(f"Histogram of {feature}")
-                ax.set_xlabel('Measurement')
-                ax.set_ylabel('Frequency')
+                ax.set_xlabel("Measurement")
+                ax.set_ylabel("Frequency")
                 ax.legend()
-            
+
             # Adjust layout to prevent overlap
             fig.tight_layout()
             plt.subplots_adjust(hspace=0.5)  # Adjust the vertical space between plots
             plt.show()
-
-
-
 
 
 if __name__ == "__main__":

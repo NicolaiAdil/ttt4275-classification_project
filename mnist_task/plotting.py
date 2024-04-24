@@ -3,9 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_confusion_matrix(
-    confusion_matrix, num_classes, error_rate, k, train_or_test="test"
-):
+def plot_confusion_matrix(confusion_matrix, num_classes, title, train_or_test="test"):
     # Plot the confusion matrix
     plt.figure(figsize=(10, 7))
     sns.heatmap(
@@ -18,9 +16,7 @@ def plot_confusion_matrix(
     )
     plt.xlabel("Predicted")
     plt.ylabel("Actual")
-    plt.title(
-        f"Confusion Matrix for {train_or_test.capitalize()} Data\nK = {k}\nError rate : {error_rate:.2f}%"
-    )
+    plt.title(f"Confusion Matrix for {train_or_test.capitalize()} Data" + title)
     plt.show()
 
 
@@ -105,9 +101,7 @@ def display_classification(
 
 
 def plot_templates(templates, labels, nClusters, nTemplates=6, nClasses=10):
-    fig, axes = plt.subplots(
-        nClasses, nTemplates, figsize=(12, 20)
-    )
+    fig, axes = plt.subplots(nClasses, nTemplates, figsize=(12, 20))
 
     # Iterate over each class
     for i in range(nClasses):
