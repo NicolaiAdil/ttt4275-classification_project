@@ -1,4 +1,3 @@
-
 import os
 import scipy.io
 import matplotlib.pyplot as plt
@@ -19,20 +18,22 @@ from plotting import (
 def get_data_from_mat(relative_path: str) -> dict:
     # Get the absolute path of the script (i.e., where the script is located)
     script_dir = os.path.dirname(__file__)
-    
+
     # Construct the absolute file path to the .mat file
     mat_file_path = os.path.join(script_dir, relative_path)
-    
+
     return scipy.io.loadmat(mat_file_path)
 
 
 def main():
-    
+
     while True:
         print("\nMenu:")
-        print("1: Nearest neighboor classifier using euclidean distance (with batching)")
-        print("2: Nearest neighboor classifier: Compare time used with or without batching")
-        print("3: K-Nearest neighboor classifier using euclidean distance")
+        print("1: All data: K-Nearest neighboor classifier using euclidean distance k=1")
+        print("2: All data: K-Nearest neighboor classifier using euclidean distance k=5")
+        print("3: All data: K-Nearest neighboor classifier: Compare time used with or without batching k=1")
+        print("4: Clustering: K-Nearest neighboor classifier using euclidean distance k=1")
+        print("5: Clustering: K-Nearest neighboor classifier using euclidean distance k=7")
         print("q: Quit")
 
         choice = input("Your choice: ")
@@ -41,58 +42,156 @@ def main():
         if choice == "q":
             break
 
-        mnist_data = get_data_from_mat('mnist_data/data_all.mat')
-        # Choose how large of a subset of the training and test data you want to train with
-        TRAIN_SAMPLE_SIZE = len(mnist_data['trainlab'])  
-        TEST_SAMPLE_SIZE = len(mnist_data['testlab']) // 20 # 5% of the test data, 500 samples
-
-        # Create the object and load data into the member variables
-        mnist_classifier = Classifier()
-        mnist_classifier.load_data(mnist_data, TEST_SAMPLE_SIZE, TRAIN_SAMPLE_SIZE)
+        mnist_data = get_data_from_mat("mnist_data/data_all.mat")
 
         # Task 1
-        if choice in ['1', '2']:
-        
-            plot_histogram(mnist_classifier.test_labels, mnist_classifier.train_labels, "Histogram of Class Distribution in Training Data")
-            
+        if choice in ["1", "2", "3"]:
+            # Choose how large of a subset of the training and test data you want to train with
+            TRAIN_SAMPLE_SIZE = len(mnist_data["trainlab"])
+            TEST_SAMPLE_SIZE = len(mnist_data["testlab"]) // 20  # 5% of the test data, 500 samples
+
+            # Create the object and load data into the member variables
+            mnist_classifier = Classifier()
+            mnist_classifier.load_data(mnist_data, TEST_SAMPLE_SIZE, TRAIN_SAMPLE_SIZE)
+
+            plot_histogram(
+                mnist_classifier.test_labels,
+                mnist_classifier.train_labels,
+                "Histogram of Class Distribution in Test and Train Data",
+            )
+
             # Task 1a, 1b
-            if choice == '1':
+            if choice in ["1", "2"]:
+                # Task 1a
+                if choice == "1":
+                    k = 1
+                # Extra
+                if choice == "2":
+                    k = 5
 
                 # We look at just the nearest neighbor (k=1) to determine the class of the test data
-                predictions = mnist_classifier.process_in_batches(k=1, batch_size=1000)
+                predictions = mnist_classifier.process_in_batches(
+                    mnist_classifier.test_data,
+                    mnist_classifier.train_data,
+                    mnist_classifier.train_labels,
+                    k=k,
+                    batch_size=1000,
+                )
 
                 error_rate = mnist_classifier.get_error_rate(predictions)
-                confusion_matrix = mnist_classifier.get_confusion_matrix(predictions, "test")
-                plot_confusion_matrix(confusion_matrix, mnist_classifier.num_classes, error_rate, "test")
+                confusion_matrix = mnist_classifier.get_confusion_matrix(
+                    predictions, "test"
+                )
+                plot_confusion_matrix(
+                    confusion_matrix,
+                    mnist_classifier.num_classes,
+                    error_rate,
+                    k,
+                    "test",
+                )
 
-                # Display the classification results
-                images_reshaped = mnist_classifier.test_data.reshape(-1, 28, 28)  # Assuming test_data is flattened
-                display_classification(images_reshaped, mnist_classifier.test_labels, predictions, num_images=10)
-            
+                # Task 1b
+                images_reshaped = mnist_classifier.test_data.reshape(
+                    -1, 28, 28
+                )  # Assuming test_data is flattened
+                display_classification(
+                    images_reshaped,
+                    mnist_classifier.test_labels,
+                    predictions,
+                    num_images=10,
+                    title=f"Classification Results\nK={k}",
+                )
+
             # Extra
-            if choice == '2':
-                # We look at just the nearest neighbor (k=1) to determine the class of the test data
+            if choice == "3":
+                k = 1
+
                 start_time_batch = time.time()
-                predictions_batch = mnist_classifier.process_in_batches(k=1, batch_size=1000)
+                predictions_batch = mnist_classifier.process_in_batches(
+                    mnist_classifier.test_data,
+                    mnist_classifier.train_data,
+                    mnist_classifier.train_labels,
+                    k=k,
+                    batch_size=1000,
+                )
                 end_time_batch = time.time()
-                print(f"Time taken to process test data in batches: {end_time_batch - start_time_batch:.2f} seconds")
+                print(
+                    f"Time taken to process test data in batches: {end_time_batch - start_time_batch:.2f} seconds\n k={k}\nTrain data samples = {TRAIN_SAMPLE_SIZE}\nTest data samples = {TEST_SAMPLE_SIZE}"
+                )
 
                 start_time = time.time()
-                predictions = mnist_classifier.predict(mnist_classifier.test_data, k=1)
+                predictions = mnist_classifier.knn_predict(
+                    mnist_classifier.test_data,
+                    mnist_classifier.train_data,
+                    mnist_classifier.train_labels,
+                    k=k,
+                )
                 end_time = time.time()
-                print(f"Time taken to predict test data: {end_time - start_time:.2f} seconds")
+                print(
+                    f"Time taken to predict test data: {end_time - start_time:.2f} seconds\n k={k}\nTrain data samples = {TRAIN_SAMPLE_SIZE}\nTest data samples = {TEST_SAMPLE_SIZE}"
+                )
 
-            
-        if choice == '3':
-            # Perform clustering
-            templates = mnist_classifier.k_means_cluster_by_class(num_clusters=64)
-            
-            plot_templates(templates, nTemplates=6)
+        if choice in ["4", "5"]:
+            # Choose how large of a subset of the training and test data you want to train with
+            TRAIN_SAMPLE_SIZE = 6000
+            TEST_SAMPLE_SIZE = (
+                len(mnist_data["testlab"]) // 20
+            )  # 5% of the test data, 500 samples
+            if choice == "4":
+                k = 1
+            # Task 2c
+            if choice == "5":
+                k = 7
+
+            plot_histogram(
+                mnist_classifier.test_labels,
+                mnist_classifier.train_labels,
+                "Histogram of Class Distribution in Test and Train Data",
+            )
+
+            # Create the object and load data into the member variables
+            mnist_classifier = Classifier()
+            mnist_classifier.load_data(mnist_data, TEST_SAMPLE_SIZE, TRAIN_SAMPLE_SIZE)
+
+            # Task 2a
+            templates_data, template_labels = mnist_classifier.cluster_by_class(
+                num_clusters=64
+            )
+            plot_templates(templates_data, template_labels, nTemplates=6)
+
+            # Perform classification
+            start_time = time.time()
+            predictions = mnist_classifier.knn_predict(
+                mnist_classifier.test_data, templates_data, template_labels, k=k
+            )
+            end_time = time.time()
+
+            # Task 2b
+            print(
+                f"Time taken to predict test data: {end_time - start_time:.2f} seconds\nk={k}\nTrain data samples = {TRAIN_SAMPLE_SIZE}\nTest data samples = {TEST_SAMPLE_SIZE}"
+            )
+            error_rate = mnist_classifier.get_error_rate(predictions)
+            confusion_matrix = mnist_classifier.get_confusion_matrix(
+                predictions, "test"
+            )
+            plot_confusion_matrix(
+                confusion_matrix, mnist_classifier.num_classes, error_rate, k, "test"
+            )
+
+            # # Display the classification results
+            # images_reshaped = mnist_classifier.test_data.reshape(
+            #     -1, 28, 28
+            # )  # Assuming test_data is flattened
+            # display_classification(
+            #     images_reshaped,
+            #     mnist_classifier.test_labels,
+            #     predictions,
+            #     num_images=10,
+            # )
 
         else:
             print("Invalid choice. Please try again.")
-            continue
-            
+
 
 if __name__ == "__main__":
     main()
