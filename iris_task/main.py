@@ -2,18 +2,14 @@ import sys
 from sklearn.datasets import load_iris
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 # Internal imports
-from handle_data import (
-    load_dataset,
-    split_dataset,
-    create_train_and_test,
-)
+from handle_data import create_train_and_test
 from plot import (
     plot_characteristics_separability,
     plot_error_rate,
     plot_confusion_matrix,
+    plot_characteristics_separability_histogram,
 )
 from train import (
     LinearClassifier,
@@ -50,7 +46,7 @@ def main(verbose=False):
             iris_data[100:150],
         )
 
-        alphas = [0.0025, 0.005, 0.0075]
+        alphas = [0.0025, 0.005, 0.0075, 0.01]
 
         # Plot the characteristics of the iris dataset for each class
         if choice == "1":
@@ -102,16 +98,21 @@ def main(verbose=False):
                 iris,
                 "train",
                 f"First 30 samples for training, last 20 samples for testing\nα = {best_alpha}",
+                error_rate_train=error_rate_vector[-1],
             )
             plot_confusion_matrix(
                 best_classifier,
                 iris,
                 "test",
                 f"First 30 samples for training, last 20 samples for testing\nα = {best_alpha}",
+                error_rate_test=error_rate_test_vector[-1],
             )
 
         # Use first 20 samples for training and last 30 samples for testing
         if choice == "3":
+
+            test_condition = "Last 30 samples for training, first 20 samples for testing"
+
             # --- Task 1d --- #
             test_data, test_labels, train_data, train_labels = create_train_and_test(
                 setosa_matrix, versicolor_matrix, virginica_matrix, 20
@@ -122,7 +123,7 @@ def main(verbose=False):
                 test_data,
                 test_labels,
                 alphas,
-                "First 20 samples for training, last 30 samples for testing",
+                test_condition,
                 verbose,
             )
             best_alpha = 0.005
@@ -135,7 +136,7 @@ def main(verbose=False):
             plot_error_rate(
                 error_rate_vector,
                 error_rate_test_vector,
-                f"First 20 samples for training, last 30 samples for testing\nα = {best_alpha}",
+                f"{test_condition}\nα = {best_alpha}",
             )
 
             # Plot the confusion matrix for the training and test data
@@ -143,13 +144,15 @@ def main(verbose=False):
                 best_classifier,
                 iris,
                 "train",
-                f"First 20 samples for training, last 30 samples for testing\nα = {best_alpha}",
+                f"{test_condition}\nα = {best_alpha}",
+                error_rate_train=error_rate_vector[-1],
             )
             plot_confusion_matrix(
                 best_classifier,
                 iris,
                 "test",
-                f"First 20 samples for training, last 30 samples for testing\nα = {best_alpha}",
+                f"{test_condition}\nα = {best_alpha}",
+                error_rate_test=error_rate_test_vector[-1],
             )
 
         # Remove features
@@ -194,47 +197,23 @@ def main(verbose=False):
                 iris,
                 "train",
                 f"After removing features: {removed_features}\nα = {best_alpha}",
+                error_rate_train=error_rate_vector[-1],
             )
             plot_confusion_matrix(
                 best_classifier,
                 iris,
                 "test",
                 f"After removing features: {removed_features}\nα = {best_alpha}",
+                error_rate_test=error_rate_test_vector[-1],
             )
 
         if choice == "7":
             # Creating histograms for each feature with all classes in the same plot
-            features = iris.feature_names
-            class_names = iris.target_names
             data = iris_data
             labels = iris.target
-
-            # Setting up the figure for plotting
-            fig, axes = plt.subplots(nrows=4, ncols=1, figsize=(6, 20))
-            colors = ["blue", "orange", "green"]
-
-            # Plotting histograms
-            for i, feature in enumerate(features):
-                ax = axes[i]
-                for j, class_name in enumerate(class_names):
-                    class_mask = labels == j
-                    ax.hist(
-                        data[class_mask, i],
-                        bins=10,
-                        color=colors[j],
-                        alpha=0.7,
-                        label=f"{class_name} ({feature})",
-                    )
-
-                ax.set_title(f"Histogram of {feature}")
-                ax.set_xlabel("Measurement")
-                ax.set_ylabel("Frequency")
-                ax.legend()
-
-            # Adjust layout to prevent overlap
-            fig.tight_layout()
-            plt.subplots_adjust(hspace=0.5)  # Adjust the vertical space between plots
-            plt.show()
+            features = iris.feature_names
+            class_names = iris.target_names
+            plot_characteristics_separability_histogram(data, labels, features, class_names)
 
 
 if __name__ == "__main__":

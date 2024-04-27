@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 import matplotlib.pyplot as plt
+from plot import SIZE_LABEL, SIZE_TITLE, SIZE_AXIS
 
 
 def MSE(predictions, ground_truth):
@@ -30,11 +31,13 @@ def train_and_plot_MSE(
             train_data, train_labels, test_data, test_labels, verbose
         )
         plt.plot(loss_vector, label=f"Alpha: {alpha}")
-    # Plot the MSE for each step length
-    plt.title(f"MSE of the training data: {title}")
-    plt.xlabel("Iteration")
-    plt.ylabel("MSE")
-    plt.legend()
+
+    plt.title(f"MSE of the training data: {title}", fontsize=SIZE_TITLE)
+    plt.xlabel("Iteration", fontsize=SIZE_LABEL)
+    plt.ylabel("MSE", fontsize=SIZE_LABEL)
+    plt.legend(fontsize=SIZE_LABEL)
+    plt.xticks(fontsize=SIZE_AXIS)
+    plt.yticks(fontsize=SIZE_AXIS)
     plt.show()
 
 
@@ -173,10 +176,10 @@ class LinearClassifier:
 
             loss_vector.append(test_loss)
             error_rate_vector.append(
-                self.get_error_rate(test_predictions, test_ground_truth)
+                self.get_error_rate(predictions, ground_truth)
             )
             error_rate_test_vector.append(
-                self.get_error_rate(predictions, ground_truth)
+                self.get_error_rate(test_predictions, test_ground_truth)
             )
 
         return loss_vector, error_rate_vector, error_rate_test_vector
