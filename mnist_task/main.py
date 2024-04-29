@@ -12,6 +12,7 @@ from plotting import (
     plot_histogram,
     display_classification,
     plot_templates,
+    plot_examples,
 )
 
 
@@ -29,11 +30,12 @@ def main():
 
     while True:
         print("\nMenu:")
+        print("0: Plot 1 example of each of the classes")
         print(
             "1: All data: K-Nearest neighboor classifier using euclidean distance k=1"
         )
         print(
-            "2: All data: K-Nearest neighboor classifier using euclidean distance k=5"
+            "2: All data: K-Nearest neighboor classifier using euclidean distance k=7"
         )
         print(
             "3: All data: K-Nearest neighboor classifier: Compare time used with or without batching k=1 REMEMBER TO CHANGE TEST SAMPLE SIZE!"
@@ -59,8 +61,14 @@ def main():
             mnist_data["trainlab"]
         )  # 100% of the training data, 60,000 samples
         TEST_SAMPLE_SIZE = (
-            len(mnist_data["testlab"]) // 20
+            len(mnist_data["testlab"])
         )  # 5% of the test data, 500 samples
+
+        if choice == "0":
+            # Assume that the function plot_examples(images, labels, num_classes) is defined in the plotting module
+            images_reshaped = mnist_data['trainv'].reshape(-1, 28, 28)
+            labels = mnist_data['trainlab']  # Adjusting the label indexing if necessary
+            plot_examples(images_reshaped, labels, 10)
 
         # Task 1
         if choice in ["1", "2", "3"]:
@@ -69,7 +77,7 @@ def main():
                 k = 1
             # Extra
             if choice == "2":
-                k = 5
+                k = 7
 
             # Create the object and load data into the member variables
             mnist_classifier = Classifier()
@@ -99,7 +107,7 @@ def main():
                 plot_confusion_matrix(
                     confusion_matrix,
                     mnist_classifier.num_classes,
-                    f"\nK = {k}\nTrain Size: {TRAIN_SAMPLE_SIZE}, Test Size: {TEST_SAMPLE_SIZE}\nError rate : {error_rate:.2f}%",
+                    f"K = {k}\nTrain Size: {TRAIN_SAMPLE_SIZE}, Test Size: {TEST_SAMPLE_SIZE}\nError rate : {error_rate:.2f}%",
                     "test",
                 )
 
@@ -191,7 +199,7 @@ def main():
             plot_confusion_matrix(
                 confusion_matrix,
                 mnist_classifier.num_classes,
-                f"\nK = {k}\nTrain Size: {TRAIN_SAMPLE_SIZE}, Test Size: {TEST_SAMPLE_SIZE}\nError rate : {error_rate:.2f}%",
+                f"K = {k}, with clustering\nTrain Size: {TRAIN_SAMPLE_SIZE}, Test Size: {TEST_SAMPLE_SIZE}\nError rate : {error_rate:.2f}%",
                 "test",
             )
 
